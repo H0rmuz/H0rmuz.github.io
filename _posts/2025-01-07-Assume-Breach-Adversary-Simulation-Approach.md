@@ -147,7 +147,6 @@ Always change your local Kali Linux/Ubuntu machine provided hostname before exec
 To extract a comprehensive server list (remember that with active ADExplorer views, exporting requires a snapshot and the GUI caps out at 1,000 visible entries), use the following structured queries:
 
 
-```
 # 2. Search the entire directory for computer objects filtering for names or operating systems containing 'erve' (e.g., Server)
 ldapsearch -x -LLL -H ldap://yourdomain.com -D "user@yourdomain.com" -w "password" "(&(objectCategory=computer)(|(name=*erve*)(operatingSystem=*erve*)))" name operatingSystem
 
@@ -156,19 +155,14 @@ ldapsearch -E pr=1000/noprompt -LLL -H ldap://10.1.4.111 -x -D "DOMAIN\USER" -w 
 
 # 4. Identify user objects within the specified directory that contain an active os400Password attribute
 ldapsearch -E pr=1000/noprompt -LLL -H ldap://10.1.4.11 -x -D "DOMAIN\USER" -w "MyPassword1" -b "DC=X,DC=Y" "(&(objectCategory=person)(objectClass=user)(os400Password=*))"
-```
 
 _Note on Query 4:_ The presence of the `os400Password` attribute indicates specialized legacy integrations, such as IBM AS/400 systems or other legacy backends that manage credentials through this specific field.
 
-```
 # 5. Retrieve user accounts configured with Kerberos Service Principal Names (SPN) matching a pattern, while excluding krbtgt and disabled accounts
 ldapsearch "(&(samAccountType=805306368)(servicePrincipalName=M*SS*L/*)(!samAccountName=krbtgt)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))" samAccountName,pwdLastSet
-```
 
 6. **OPSEC Optimization:** Rewrite the previous query filter using hex encoding format to cleanly bypass string-based detection filters monitoring for common SPN keywords.
 
-
-```
 # 7. Query for active service accounts with SPNs matching alphabetic ranges from 'a' to 'z', excluding disabled accounts and krbtgt
 ldapsearch "(&(samAccountType=805306368)(servicePrincipalName>=a)(servicePrincipalName<=z)(!samAccountName=krbtgt)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))" samAccountName,pwdLastSet
 
@@ -186,15 +180,12 @@ ldapsearch -H ldap://10.10.10.10 -x -D "zzz@yyy.com" -w "xxxx" -b "dc=yyy,dc=loc
 
 # Search for user objects with an assigned SPN starting between 'a' and 'z', excluding krbtgt and disabled users, returning account names and password age
 ldapsearch -H ldap://10.10.10.10 -x -D "zzz@yyy.com" -w "xxxx" -b "dc=yyy,dc=local" "(&(samAccountType=805306368)(servicePrincipalName >=a)(servicePrincipalName <= z)(!(samAccountName=HEX STRING)(!(UserAccountControl:1.2.840.113556.1.4.803:=\32))))" sAMAccountName pwdLastSet
-```
 
 Convert 18-digit Active Directory/LDAP timestamps to human-readable dates using an epoch converter to accurately map out account aging.
 
 #### LDAP Queries Reference List:
 
-```
 ldapsearch -x -H ldap://yourdomain.com -D "cn=admin,dc=yourdomain,dc=com" -w "password" -b "dc=yourdomain,dc=com" "(&(objectClass=user)(userPrincipalName=username))" lastLogonTimestamp pwdLastSet whenChanged whenCreated nTSecurityDescriptor lastLogon lastLogOff
-```
 
 ### Credentials Hunting on Enumerated Shares
 
