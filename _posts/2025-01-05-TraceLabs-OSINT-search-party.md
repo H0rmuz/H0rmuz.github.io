@@ -7,7 +7,7 @@ hero: https://plus.unsplash.com/premium_photo-1673543763969-1d54002352d0?ixlib=r
 overlay: red
 ---
 
-Trace Labs Search Party CTF and Applied OSINT in Missing Persons Investigations {: .lead} <!–-break–>
+Trace Labs Search Party CTF and Applied OSINT in Missing Persons Investigations {: .lead} <!–-break-–>
 
 ## Practical OSINT and Intelligence-Driven Analysis
 
