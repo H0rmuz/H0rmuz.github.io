@@ -9,7 +9,7 @@ overlay: red
 ---
 
 
-{: .lead}
+Vault7 CIA Hive Infrastructure {: .lead} 
 
 # Leaked Architecture Analysis
 
@@ -25,13 +25,13 @@ The architecture is built from the ground up to address the problem of infrastru
 
 The network topology illustrated in `hive.png` is divided into segmented zones separated by virtual bridges and distinct Layer 2 broadcast domains. On the far left sits the operational edge, containing the implanted hosts running across diverse hardware platforms. These implants are located within isolated target subnets, utilizing IP paths such as `10.2.5.0/24` and `10.6.5.0/24`.
 
-```
+`
 [Implanted Hosts] ──(Internet)──> [VPS Redirectors] ──(Bridge: hive1 / SSL)──> [Nginx Proxy/Director]
                                                                                      │
                                           ┌──────────────────────────────────────────┴──────────────────────────────────────────┐
                                           ▼ (Bridge: hive2)                                                                     ▼ (VLAN 65)
                         [Response Servers: Cover & Honeycomb]                                                            [Command Post Operator]
-```
+`
 
 The next structural layer comprises the public-facing Virtual Private Servers. These act as initial collection nodes and are assigned distinct domain names to compartmentalize operations. As shown in `hive.png`, `domainA.com` runs on a 64-bit CentOS 6.3 instance with interfaces `eth0` (`10.6.5.191/24`) and `eth1` (`172.16.63.1/24`). Parallel to this, `domainB.com` executes on a 64-bit CentOS 6.2 instance with interfaces `eth0` (`10.6.5.192/24`) and `eth1` (`172.16.63.2/24`).
 
@@ -51,7 +51,7 @@ The Nginx Proxy uses advanced Linux kernel networking configuration to prevent c
 
 To solve this, the engineering layout in `hive.png` documents a custom Bash script executed on the Nginx Proxy that configures source-based policy routing via the `iproute2` subsystem:
 
-```
+`
 #!/bin/bash
 # Script to configure policy routing
 
@@ -63,7 +63,7 @@ ip route add default via 172.16.63.2 table hiveB
 
 ip rule add from 172.16.63.111 table hiveA prio 1
 ip rule add from 172.16.63.112 table hiveB prio 1
-```
+`
 
 The script initializes by appending custom identifiers to `/etc/iproute2/rt_tables`, establishing two entirely independent kernel routing tables: `hiveA` with numerical priority 101, and `hiveB` with numerical priority 102. Once these tables are instantiated, the script assigns dedicated default gateways to each specific table. Table `hiveA` routes all traffic through `172.16.63.1` (the internal interface of VPS A), while table `hiveB` routes traffic through `172.16.63.2` (the internal interface of VPS B).
 
@@ -81,10 +81,10 @@ The Nginx Proxy on CentOS 6.4 acts as the primary decision engine for incoming c
 
 The core mechanism relies on configuring the Nginx SSL module to enforce optional client certificate verification. The configuration relies on structural directives equivalent to:
 
-```
+`
 ssl_client_certificate /etc/nginx/certs/operation_ca.crt;
 ssl_verify_client optional;
-```
+`
 
 When an external entity connects, Nginx processes the TLS handshake. If the connecting client fails to provide a certificate, or if the certificate presented does not validate against the root certificate authority file specified in `ssl_client_certificate`, the `$ssl_client_verify` internal variable evaluates to a failure state.
 
@@ -143,7 +143,7 @@ Behind this public facade, the framework relies on Mutual TLS for identity verif
 
 The infrastructure design documented in `hive.png` prioritizes operational security over simplicity. The decision to use commercial VPS providers as front-end redirectors creates a disposable outer perimeter. If an incident response team discovers an implant and traces its network traffic, the investigation hits a wall at the commercial VPS infrastructure. Because the VPS nodes contain no local files, malware code, or identifying configurations beyond simple proxy forwarding definitions, their exposure does not compromise the core operational infrastructure.
 
-```
+`
                   ┌────────────────────────────────────────────────────────┐
                   │              Public Front-End VPS Tier                 │
                   │   - Disposable perimeter nodes                         │
@@ -163,7 +163,7 @@ The infrastructure design documented in `hive.png` prioritizes operational secur
                   │   - Honeycomb / Cover Servers behind virtual bridges   │
                   │   - Completely hidden from internet exposure           │
                   └────────────────────────────────────────────────────────┘
-```
+`
 
 The split-brain architecture driven by mTLS client certificate verification neutralizes active probing defense tactics. In modern network security, threat-hunting cells continuously probe suspicious external domains using automated scanners to footprint the underlying services. Because the Hive infrastructure defaults to routing unauthenticated connections to the Cover Server, external scans return lookups that match legitimate web assets. The authentic C2 framework remains completely hidden from internet exposure, ensuring its longevity and protecting its operational signatures from discovery.
 
