@@ -8,7 +8,7 @@ hero: https://plus.unsplash.com/premium_photo-1673543763969-1d54002352d0?ixlib=r
 overlay: red
 ---
 
-{: .lead} <!–-break–>
+Assume Breach Adversary Simulation Approach. {: .lead} <!–-break-–>
 
 ## Pre-Engagement Setup
 
